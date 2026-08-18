@@ -1,13 +1,16 @@
 'use strict';
 
-const CACHE = 'checkin-tracker-v8';
+const CACHE = 'checkin-tracker-v9';
 const ASSETS = [
   './',
   './index.html',
   './styles.css',
   './app.js',
   './manifest.webmanifest',
-  './icon.svg'
+  './icon.svg',
+  './icon-maskable.svg',
+  './icon-192.png',
+  './icon-512.png'
 ];
 
 self.addEventListener('install', (event) => {
