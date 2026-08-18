@@ -1,6 +1,6 @@
 'use strict';
 
-const CACHE = 'checkin-tracker-v11';
+const CACHE = 'checkin-tracker-v12';
 const ASSETS = [
   './',
   './index.html',
