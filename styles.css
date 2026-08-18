@@ -110,7 +110,7 @@ header h1 {
 
 .header-actions {
   display: flex;
-  gap: 8px;
+  gap: 12px;
   align-items: center;
 }
 
@@ -133,6 +133,7 @@ main {
   line-height: 1.5;
   padding-top: 28px;
   border-top: 1px solid var(--warm-sand);
+  animation: fade-in 0.3s var(--ease) both;
 }
 
 .checkin-list {
@@ -153,11 +154,15 @@ main {
   flex-direction: column;
   gap: 14px;
   animation: card-in 0.22s var(--ease) both;
-  transition: border-color 0.15s var(--ease), box-shadow 0.15s var(--ease);
+  transition: border-color 0.15s var(--ease), box-shadow 0.15s var(--ease), transform 0.15s var(--ease);
 }
 
-.checkin-card:hover {
-  border-color: var(--line-strong);
+@media (hover: hover) {
+  .checkin-card:hover {
+    border-color: var(--line-strong);
+    box-shadow: 0 12px 32px rgba(20, 19, 19, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.65);
+    transform: translateY(-2px);
+  }
 }
 
 @keyframes card-in {
@@ -206,7 +211,7 @@ main {
 }
 
 .checkin-status {
-  font-size: 0.72rem;
+  font-size: 0.75rem;
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -235,7 +240,7 @@ main {
 
 .checkin-actions {
   display: flex;
-  gap: 10px;
+  gap: 12px;
   align-items: center;
 }
 
@@ -251,7 +256,7 @@ button {
 }
 
 button:active {
-  transform: scale(0.98);
+  transform: scale(0.98) translateY(1px);
 }
 
 button.primary,
@@ -331,6 +336,31 @@ dialog {
   box-shadow: var(--shadow-kami), inset 0 1px 0 rgba(255, 255, 255, 0.65);
 }
 
+@keyframes dialog-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+dialog[open] {
+  animation: dialog-in 0.24s var(--ease) both;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+dialog::backdrop {
+  animation: fade-in 0.2s var(--ease) both;
+}
+
 dialog::backdrop {
   background: rgba(20, 19, 19, 0.4);
   backdrop-filter: blur(3px);
@@ -367,6 +397,10 @@ select {
   color: var(--ink);
 }
 
+select {
+  min-height: 48px;
+}
+
 input:focus,
 select:focus {
   outline: none;
@@ -393,7 +427,7 @@ small {
 .dialog-actions {
   display: flex;
   justify-content: flex-end;
-  gap: 8px;
+  gap: 12px;
   margin-top: 24px;
 }
 
