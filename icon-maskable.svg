@@ -2,7 +2,7 @@
   <!-- Full-bleed square background for maskable crop. Artwork stays inside
        the 80% safe zone (centered circle, radius ~205) so launchers can
        crop freely. -->
-  <rect width="512" height="512" fill="#26231e"/>
-  <path d="M160 272l64 64 128-144" fill="none" stroke="#faf7f2" stroke-width="44" stroke-linecap="round" stroke-linejoin="round"/>
-  <circle cx="256" cy="256" r="168" fill="none" stroke="#faf7f2" stroke-width="22" stroke-dasharray="24 20" stroke-linecap="round"/>
+  <rect width="512" height="512" fill="#1B365D"/>
+  <path d="M160 272l64 64 128-144" fill="none" stroke="#faf9f5" stroke-width="44" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="256" cy="256" r="168" fill="none" stroke="#faf9f5" stroke-width="22" stroke-dasharray="24 20" stroke-linecap="round"/>
 </svg>

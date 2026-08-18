@@ -192,19 +192,19 @@ Open `test.html` in a browser.
 - Add per-item notes or history of check-in timestamps.
 - Consider moving storage to IndexedDB if item count grows large.
 
-## 10. Design: Editorial Paper Theme
+## 10. Design: Kami Paper Theme
 
-Applied a professional, paper-like aesthetic (no functional changes):
+Applied the **Kami** design system (github.com/tw93/Kami, installed as a skill at `~/.agents/skills/kami`) with no functional changes:
 
-- **Canvas:** warm cream `#faf7f2`; cards are warm-white `#fffdf9` ledger sheets with hairline `#e7e1d4` borders, near-zero shadows, and a subtle inner top highlight.
-- **Typography:** serif display (Georgia / Iowan / Palatino / Times fallback stack) for the masthead, card names, dialog title, and empty state; system sans for UI text, labels, and buttons. No external fonts — the PWA stays fully offline.
-- **Ink system:** primary actions are solid ink `#26231e` buttons with cream text; semantic states use muted print-like inks (sage green for done, slate blue for count-up, brick for delete) with tinted card fills and matched borders.
-- **Status badges:** uppercase, letterspaced, outline-stamped pills; count-up day values use `tabular-nums` so the counter never shifts.
-- **Paper grain:** a fixed, `pointer-events: none` SVG turbulence overlay at low opacity adds a faint paper texture.
-- **Details:** ink-on-paper `::selection`, deliberate `:focus-visible` rings, 16px inputs (no iOS zoom), `prefers-reduced-motion` support, restrained 200ms card entry.
-- **Masthead:** sticky cream bar with a hairline rule; the header emoji was replaced with an inline SVG check mark (see `index.html`).
+- **Canvas:** warm parchment `#f5f4ed`; ivory `#faf9f5` ledger cards with sand `#e8e6dc` hairline borders and Kami's soft shadow (`0 8px 24px rgba(20,19,19,0.08)`).
+- **Brand:** deep navy `#1B365D` for primary actions, focus rings, and the masthead wordmark; hover `#2D5A8A`; hover tints `rgba(27,54,93,0.08)`.
+- **Typography:** Charter-first serif stack (Charter, Georgia, Songti SC, Noto Serif SC, Palatino) for headings and card names; system sans for controls. No external fonts — the PWA stays fully offline.
+- **Text ramp:** near-black `#141413`, olive `#504e49`, stone `#6b6a64` — warm charcoal, never pure black.
+- **Semantic states:** sage green done, navy count-up (matches brand), brick delete; count-up day values use `tabular-nums`.
+- **Icons:** PWA icon re-made in Kami navy/ivory; PNG 192/512 + maskable SVG variants for Android install.
+- **Details:** Kami-style focus ring (`2px rgba(27,54,93,0.38)`), ivory-on-navy selection, 8px radii, `prefers-reduced-motion` support.
 
-Design sources: `minimalist-ui`, `high-end-visual-design` (Editorial Luxury archetype), and the `better-*` interface family. All text/background pairs pass WCAG AA (worst normal-text pair 6.16:1; placeholder ink is 3.5:1 and exempt). Verified by screenshots at desktop and 390px mobile in populated, done, dialog, and seeded-empty states.
+All text/background pairs pass WCAG AA (worst pair 4.92:1). Verified by screenshots at desktop and 390px mobile in populated, done, dialog, and seeded-empty states.
 
 ## 10. Handoff Notes for the Next Developer
 
