@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#faf7f2" />
+  <meta name="description" content="Simple recurring check-in tracker for medicine, habits, chores, and more." />
+  <title>Check-In Tracker</title>
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="icon" href="icon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header>
+    <h1>
+      <svg class="wordmark-mark" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+        <rect x="2" y="2" width="16" height="16" rx="4" stroke="currentColor" stroke-width="1.6" />
+        <path d="M6.5 10.2l2.4 2.4 4.6-5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+      </svg>
+      Check-In Tracker
+    </h1>
+    <div class="header-actions">
+      <button id="addButton" class="primary" type="button">+ Add Item</button>
+      <button id="addCountUpButton" class="secondary" type="button">+ Count Up</button>
+    </div>
+  </header>
+
+  <main>
+    <p id="emptyMessage" class="empty-message" hidden>
+      No items yet. Tap “+ Add Item” to create one.
+    </p>
+    <div id="checkinList" class="checkin-list"></div>
+  </main>
+
+  <dialog id="editorDialog">
+    <form id="editorForm" method="dialog">
+      <h2 id="editorTitle">Add Item</h2>
+
+      <label>
+        Name
+        <input id="nameInput" type="text" placeholder="e.g. Evening Medicine" required maxlength="60" autocomplete="off" />
+      </label>
+
+      <label>
+        Item Type
+        <select id="scheduleType">
+          <option value="daily">Daily</option>
+          <option value="weekly">Weekly</option>
+          <option value="monthly">Monthly</option>
+          <option value="custom">Custom (cron)</option>
+          <option value="countup">Count Up</option>
+        </select>
+      </label>
+
+      <div id="simpleScheduleFields">
+        <label>
+          Time
+          <input id="timeInput" type="time" value="18:00" required />
+        </label>
+
+        <label id="dayOfWeekField" hidden>
+          Day of Week
+          <select id="dayOfWeek">
+            <option value="0">Sunday</option>
+            <option value="1" selected>Monday</option>
+            <option value="2">Tuesday</option>
+            <option value="3">Wednesday</option>
+            <option value="4">Thursday</option>
+            <option value="5">Friday</option>
+            <option value="6">Saturday</option>
+          </select>
+        </label>
+
+        <label id="dayOfMonthField" hidden>
+          Day of Month
+          <input id="dayOfMonth" type="number" min="1" max="31" value="1" required />
+        </label>
+      </div>
+
+      <label id="cronField" hidden>
+        Cron Expression
+        <input id="cronInput" type="text" placeholder="0 18 * * *" autocomplete="off" spellcheck="false" />
+        <small>Format: minute hour day-of-month month day-of-week</small>
+      </label>
+
+      <div class="dialog-actions">
+        <button type="button" id="cancelButton" class="secondary">Cancel</button>
+        <button type="button" id="deleteButton" class="danger" hidden>Delete</button>
+        <button type="submit" id="saveButton" class="primary">Save</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js').catch((err) => {
+          console.warn('Service worker registration failed', err);
+        });
+      });
+    }
+  </script>
+  <script src="app.js"></script>
+</body>
+</html>

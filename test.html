@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Check-In Tracker Tests</title>
+  <style>
+    body { font-family: system-ui, sans-serif; padding: 20px; max-width: 800px; margin: 0 auto; }
+    h1 { font-size: 1.4rem; }
+    .pass { color: #166534; background: #dcfce7; padding: 4px 8px; border-radius: 6px; margin: 4px 0; }
+    .fail { color: #991b1b; background: #fee2e2; padding: 4px 8px; border-radius: 6px; margin: 4px 0; }
+    #results { margin-top: 16px; }
+    pre { background: #f1f5f9; padding: 8px; border-radius: 8px; overflow-x: auto; }
+  </style>
+</head>
+<body>
+  <h1>Check-In Tracker Tests</h1>
+  <p>This page runs quick checks against the core scheduling logic in <code>app.js</code>.</p>
+  <div id="results"></div>
+
+  <!-- Minimal DOM required by app.js -->
+  <div id="checkinList" hidden></div>
+  <p id="emptyMessage" hidden></p>
+  <button id="addButton" type="button" hidden></button>
+  <button id="addCountUpButton" type="button" hidden></button>
+  <dialog id="editorDialog">
+    <form id="editorForm">
+      <h2 id="editorTitle"></h2>
+      <input id="nameInput" type="text" />
+      <select id="scheduleType">
+        <option value="daily">Daily</option>
+        <option value="weekly">Weekly</option>
+        <option value="monthly">Monthly</option>
+        <option value="custom">Custom</option>
+        <option value="countup">Count Up</option>
+      </select>
+      <div id="simpleScheduleFields">
+        <input id="timeInput" type="time" value="18:00" />
+        <label id="dayOfWeekField" hidden>
+          Day of Week
+          <select id="dayOfWeek"><option value="1">Monday</option></select>
+        </label>
+        <label id="dayOfMonthField" hidden>
+          Day of Month
+          <input id="dayOfMonth" type="number" value="1" />
+        </label>
+      </div>
+      <div id="cronField" hidden><input id="cronInput" type="text" value="0 18 * * *" /></div>
+      <button id="cancelButton" type="button"></button>
+      <button id="deleteButton" type="button" hidden></button>
+      <button id="saveButton" type="submit"></button>
+    </form>
+  </dialog>
+
+  <script src="app.js"></script>
+  <script>
+    (function runTests() {
+      const results = document.getElementById('results');
+      let passed = 0;
+      let failed = 0;
+
+      function assert(actual, expected, name) {
+        const ok = JSON.stringify(actual) === JSON.stringify(expected);
+        const div = document.createElement('div');
+        div.className = ok ? 'pass' : 'fail';
+        div.textContent = (ok ? 'PASS: ' : 'FAIL: ') + name + (ok ? '' : ` — expected ${JSON.stringify(expected)}, got ${JSON.stringify(actual)}`);
+        results.appendChild(div);
+        if (ok) passed++; else failed++;
+      }
+
+      function assertDate(actual, expected, name) {
+        const ok = actual instanceof Date && expected instanceof Date && actual.getTime() === expected.getTime();
+        const div = document.createElement('div');
+        div.className = ok ? 'pass' : 'fail';
+        div.textContent = (ok ? 'PASS: ' : 'FAIL: ') + name + (ok ? '' : ` — expected ${expected}, got ${actual}`);
+        results.appendChild(div);
+        if (ok) passed++; else failed++;
+      }
+
+      // --- Cron parsing ---
+      try {
+        const cron = parseCron('0 18 * * *');
+        assert(cron.minute.has(0), true, 'parseCron minute 0');
+        assert(cron.hour.has(18), true, 'parseCron hour 18');
+        assert(cron.dom.has(1), true, 'parseCron dom has 1');
+        assert(cron.month.has(12), true, 'parseCron month has 12');
+      } catch (err) {
+        assert(false, true, 'parseCron should not throw: ' + err.message);
+      }
+
+      // --- Next / previous occurrence ---
+      assertDate(
+        nextOccurrence('0 18 * * *', new Date(2025, 0, 1, 12, 0, 0)),
+        new Date(2025, 0, 1, 18, 0, 0),
+        'nextOccurrence daily 6pm same day'
+      );
+      assertDate(
+        previousOccurrence('0 18 * * *', new Date(2025, 0, 1, 12, 0, 0)),
+        new Date(2024, 11, 31, 18, 0, 0),
+        'previousOccurrence daily 6pm before first use'
+      );
+
+      // --- Period start behavior ---
+      assertDate(
+        currentPeriodStart({ cron: '0 18 * * *' }, new Date(2025, 0, 1, 12, 0, 0)),
+        new Date(2025, 0, 1, 0, 0, 0),
+        'daily period starts at midnight'
+      );
+      assertDate(
+        currentPeriodStart({ cron: '0 20 * * 1' }, new Date(2025, 0, 7, 12, 0, 0)),
+        new Date(2025, 0, 6, 0, 0, 0),
+        'weekly period starts on Monday'
+      );
+      assertDate(
+        currentPeriodStart({ cron: '0 17 1 * *' }, new Date(2025, 0, 15, 12, 0, 0)),
+        new Date(2025, 0, 1, 0, 0, 0),
+        'monthly period starts on 1st'
+      );
+      assertDate(
+        currentPeriodStart({ cron: '0 18 * * *', mode: 'custom' }, new Date(2025, 0, 1, 12, 0, 0)),
+        new Date(2024, 11, 31, 18, 0, 0),
+        'custom daily cron uses most recent fire time'
+      );
+      assert(inferMode('0 18 * * *'), 'daily', 'inferMode daily');
+      assert(inferMode('0 8,20 * * *'), 'custom', 'inferMode custom multi-time');
+
+      // --- Descriptions ---
+      assert(cronToDescription('0 18 * * *'), 'Daily at 6:00 PM', 'description daily');
+      assert(cronToDescription('0 20 * * 1'), 'Weekly on Monday at 8:00 PM', 'description weekly');
+      assert(cronToDescription('0 17 1 * *'), 'Monthly on day 1 at 5:00 PM', 'description monthly');
+      assert(cronToDescription('0 8,20 * * *'), 'Cron: 0 8,20 * * *', 'description custom multi-time');
+      assert(cronToDescription('0 18 * * *', 'custom'), 'Cron: 0 18 * * *', 'description custom daily shows cron');
+
+      // --- Done/reset logic ---
+      const realNow = new Date();
+      const daily = { cron: '0 18 * * *', donePeriodStart: currentPeriodStart({ cron: '0 18 * * *' }, realNow).toISOString() };
+      assert(isDone(daily), true, 'isDone true for current daily period');
+
+      const twoDaysAgo = new Date(realNow.getTime() - 2 * 24 * 60 * 60 * 1000);
+      const oldDaily = { cron: '0 18 * * *', donePeriodStart: currentPeriodStart({ cron: '0 18 * * *' }, twoDaysAgo).toISOString() };
+      assert(isDone(oldDaily), false, 'isDone false for previous daily period');
+
+      // --- Count-up logic ---
+      const cuNow = new Date(2025, 0, 5, 12, 0, 0);
+      const cuDay1 = new Date(2025, 0, 1, 0, 0, 0).toISOString();
+      const cuTodayEarly = new Date(2025, 0, 5, 6, 0, 0).toISOString();
+      const cuYesterdayLate = new Date(2025, 0, 4, 23, 0, 0).toISOString();
+      assert(isCountUp({ type: 'countup' }), true, 'isCountUp true for countup');
+      assert(isCountUp({ type: 'checkin' }), false, 'isCountUp false for checkin');
+      assert(countUpDays({ lastCheckInAt: cuDay1 }, cuNow), 4, 'countUpDays full days');
+      assert(countUpDays({ lastCheckInAt: cuTodayEarly }, cuNow), 0, 'countUpDays today');
+      assert(countUpDays({ lastCheckInAt: cuYesterdayLate }, cuNow), 1, 'countUpDays yesterday');
+      assert(countUpDays({ lastCheckInAt: null }, cuNow), null, 'countUpDays null when never checked in');
+      assert(countUpStatus({ lastCheckInAt: cuDay1 }, cuNow), '4 days', 'countUpStatus days');
+      assert(countUpStatus({ lastCheckInAt: cuTodayEarly }, cuNow), '0 days', 'countUpStatus today');
+      assert(countUpStatus({ lastCheckInAt: cuYesterdayLate }, cuNow), '1 day', 'countUpStatus one day');
+      assert(countUpStatus({ lastCheckInAt: null }, cuNow), 'No check-in yet', 'countUpStatus never');
+      assert(countUpLastLabel({ lastCheckInAt: cuDay1 }).startsWith('Last check-in:'), true, 'countUpLastLabel prefix');
+      assert(countUpDays({ lastCheckInAt: 'not-a-date' }, cuNow), null, 'countUpDays invalid date');
+      assert(countUpStatus({ lastCheckInAt: 'not-a-date' }, cuNow), 'No check-in yet', 'countUpStatus invalid date');
+      assert(countUpLastLabel({ lastCheckInAt: 'not-a-date' }), 'Last check-in: never', 'countUpLastLabel invalid date');
+      const normalizedCountUp = normalizeCheckin({ id: 'cu1', name: 'Streak', type: 'countup', lastCheckInAt: cuDay1 });
+      assert(normalizedCountUp.type, 'countup', 'normalize countup type');
+      assert(normalizedCountUp.lastCheckInAt, cuDay1, 'normalize countup timestamp');
+      const numericTimestamp = new Date(2025, 0, 2, 0, 0, 0).getTime();
+      const normalizedNumericCountUp = normalizeCheckin({ id: 'cu2', name: 'Numeric Counter', type: 'countup', lastCheckInAt: numericTimestamp });
+      assert(normalizedNumericCountUp.type, 'countup', 'normalize numeric countup type');
+      assert(normalizedNumericCountUp.lastCheckInAt, new Date(numericTimestamp).toISOString(), 'normalize numeric countup timestamp');
+
+      const summary = document.createElement('h2');
+      summary.textContent = `${passed} passed, ${failed} failed`;
+      results.prepend(summary);
+    })();
+  </script>
+</body>
+</html>

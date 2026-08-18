@@ -1,0 +1,433 @@
+/* ============================================================
+   Check-In Tracker — Editorial Paper theme
+   A professional, paper-like aesthetic: warm cream canvas,
+   ink typography, hairline rules, flat ledger cards, and a
+   whisper of film grain. No external fonts; the PWA stays
+   fully offline-capable.
+   ============================================================ */
+
+:root {
+  /* Paper & ink */
+  --paper: #faf7f2;        /* canvas — warm bone */
+  --paper-deep: #f1ece3;   /* wells: inputs, secondary hover */
+  --card: #fffdf9;         /* card surface */
+  --ink: #26231e;          /* primary text / primary action */
+  --ink-deep: #14120f;     /* hover press */
+  --ink-soft: #57524a;     /* secondary text */
+  --ink-faint: #8b8377;    /* tertiary text, placeholders */
+  --line: #e7e1d4;         /* hairline rules */
+  --line-strong: #d6cfc0;
+
+  /* Semantic inks — muted, print-like */
+  --success-ink: #33523a;
+  --success-bg: #edf3ea;
+  --success-line: #c2d6ba;
+  --info-ink: #2a5266;
+  --info-bg: #e8eff2;
+  --info-line: #a8c2d2;
+  --danger-ink: #8a3a32;
+  --danger-bg: #f6ebe7;
+  --danger-line: #e6d1ca;
+
+  --radius: 10px;
+  --radius-sm: 6px;
+  --shadow-card: 0 1px 2px rgba(38, 35, 30, 0.05), 0 2px 6px rgba(38, 35, 30, 0.04);
+  --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+
+  --font-serif: Georgia, "Iowan Old Style", "Palatino Linotype",
+    "Book Antiqua", "Times New Roman", serif;
+  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.6;
+  background: var(--paper);
+  color: var(--ink);
+  min-height: 100%;
+  padding-bottom: env(safe-area-inset-bottom);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* Subtle paper grain — fixed, inert, above content but below dialogs */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  pointer-events: none;
+  opacity: 0.5;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.09'/%3E%3C/svg%3E");
+}
+
+::selection {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+/* --- Masthead ---------------------------------------------------------- */
+
+header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 18px 24px;
+  background: var(--paper);
+  border-bottom: 1px solid var(--line);
+}
+
+header h1 {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: 1.35rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  min-width: 0;
+}
+
+.wordmark-mark {
+  width: 20px;
+  height: 20px;
+  flex: none;
+  margin-top: 2px;
+  color: var(--ink);
+}
+
+.header-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+/* --- Layout ------------------------------------------------------------ */
+
+main {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 32px 24px 56px;
+}
+
+.empty-message {
+  text-align: center;
+  color: var(--ink-soft);
+  margin: 64px auto 0;
+  max-width: 40ch;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 1.1rem;
+  line-height: 1.5;
+  padding-top: 28px;
+  border-top: 1px solid var(--line);
+}
+
+.checkin-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* --- Ledger cards ------------------------------------------------------ */
+
+.checkin-card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-card), inset 0 1px 0 rgba(255, 255, 255, 0.65);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  animation: card-in 0.22s var(--ease) both;
+}
+
+@keyframes card-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.checkin-card.done {
+  border-color: var(--success-line);
+  background: var(--success-bg);
+}
+
+.checkin-card.countup {
+  border-color: var(--info-line);
+  background: var(--info-bg);
+}
+
+.checkin-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.checkin-name {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: 1.15rem;
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: -0.005em;
+  text-wrap: balance;
+}
+
+.checkin-schedule {
+  margin: 3px 0 0;
+  color: var(--ink-soft);
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
+.checkin-status {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--card);
+  color: var(--ink-soft);
+  border: 1px solid var(--line-strong);
+}
+
+.checkin-card.done .checkin-status {
+  background: var(--success-bg);
+  color: var(--success-ink);
+  border-color: var(--success-line);
+}
+
+.checkin-card.countup .checkin-status {
+  background: var(--info-bg);
+  color: var(--info-ink);
+  border-color: var(--info-line);
+  font-variant-numeric: tabular-nums;
+}
+
+/* --- Actions ----------------------------------------------------------- */
+
+.checkin-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+button {
+  font: inherit;
+  font-weight: 600;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  padding: 10px 18px;
+  cursor: pointer;
+  transition: background-color 0.15s var(--ease), border-color 0.15s var(--ease),
+    color 0.15s var(--ease), transform 0.05s var(--ease);
+}
+
+button:active {
+  transform: scale(0.98);
+}
+
+button.primary,
+.done-button.undone {
+  background: var(--ink);
+  color: var(--paper);
+  border-color: var(--ink);
+}
+
+button.primary:hover,
+.done-button.undone:hover {
+  background: var(--ink-deep);
+  border-color: var(--ink-deep);
+}
+
+button.secondary {
+  background: var(--card);
+  color: var(--ink);
+  border-color: #c9c1af;
+}
+
+button.secondary:hover {
+  background: var(--paper-deep);
+}
+
+button.danger {
+  background: var(--danger-bg);
+  color: var(--danger-ink);
+  border-color: var(--danger-line);
+}
+
+button.danger:hover {
+  background: var(--danger-line);
+}
+
+.done-button {
+  flex: 1;
+  padding: 13px 18px;
+  font-size: 0.95rem;
+  border-radius: var(--radius-sm);
+}
+
+.done-button.done {
+  background: var(--success-ink);
+  color: var(--paper);
+  border-color: var(--success-ink);
+}
+
+.done-button.done:hover {
+  background: #2b4431;
+}
+
+.edit-button {
+  background: transparent;
+  color: var(--ink-soft);
+  padding: 10px 14px;
+  border-color: var(--line);
+}
+
+.edit-button:hover {
+  background: var(--paper-deep);
+  color: var(--ink);
+}
+
+/* --- Dialog: a paper form card ----------------------------------------- */
+
+dialog {
+  border: 1px solid var(--line-strong);
+  border-radius: 12px;
+  padding: 28px;
+  width: min(92vw, 480px);
+  background: #fdfaf4;
+  color: var(--ink);
+  box-shadow: 0 24px 48px rgba(38, 35, 30, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.65);
+}
+
+dialog::backdrop {
+  background: rgba(38, 35, 30, 0.38);
+  backdrop-filter: blur(3px);
+}
+
+dialog h2 {
+  margin: 0 0 20px;
+  font-family: var(--font-serif);
+  font-size: 1.3rem;
+  font-weight: 700;
+  line-height: 1.25;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--line);
+}
+
+form label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 16px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+input,
+select {
+  font: inherit;
+  font-size: 16px;
+  padding: 10px 12px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-sm);
+  background: var(--paper);
+  color: var(--ink);
+}
+
+input:focus,
+select:focus {
+  outline: none;
+  border-color: var(--ink);
+  box-shadow: 0 0 0 3px rgba(38, 35, 30, 0.1);
+}
+
+input:focus-visible,
+select:focus-visible,
+button:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+::placeholder {
+  color: var(--ink-faint);
+}
+
+small {
+  color: var(--ink-soft);
+  font-weight: 400;
+}
+
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 24px;
+}
+
+.dialog-actions .danger {
+  margin-right: auto;
+}
+
+/* --- Small screens ------------------------------------------------------ */
+
+@media (max-width: 480px) {
+  header {
+    padding: 14px 16px;
+    flex-wrap: wrap;
+  }
+
+  header h1 {
+    font-size: 1.15rem;
+  }
+
+  main {
+    padding: 24px 16px 48px;
+  }
+
+  .checkin-card {
+    padding: 16px;
+  }
+
+  .dialog-actions {
+    flex-wrap: wrap;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
